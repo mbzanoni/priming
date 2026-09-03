@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Actividad: palabras</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --azul: #8CC5E3;
+    --teal: #0D7E87;
+    --coral: #F55F74;
+    --violeta: #4A2477;
+    --tinta: #1a1a2e;
+    --papel: #fafaf7;
+    --gris: #6b6b7a;
+    --borde: #e5e5e0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+    min-height: 100vh;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: 28px;
+  }
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--violeta);
+  }
+  .progress { font-size: 13px; color: var(--gris); }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--violeta);
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--tinta);
+    margin-bottom: 12px;
+  }
+  p { margin-bottom: 14px; }
+  .lead { color: var(--gris); font-size: 15px; }
+
+  .step { display: none; animation: fade .3s ease; }
+  .step.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--tinta);
+  }
+  input[type="text"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--borde);
+    border-radius: 8px;
+    background: white;
+    color: var(--tinta);
+    outline: none;
+    transition: border-color .15s;
+    -webkit-appearance: none;
+  }
+  input:focus { border-color: var(--teal); }
+
+  button {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--teal);
+    color: white;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background .15s, transform .1s;
+  }
+  button:hover { background: #0a6870; }
+  button:active { transform: scale(0.98); }
+  button:disabled { background: var(--gris); opacity: 0.5; cursor: not-allowed; }
+
+  /* Grid de primes */
+  .primes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .prime {
+    padding: 18px 12px;
+    background: white;
+    border: 1.5px solid var(--borde);
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .prime:active { transform: scale(0.97); }
+  .prime.sel {
+    background: var(--coral);
+    color: white;
+    border-color: var(--coral);
+  }
+  .contador-sel {
+    text-align: center;
+    font-size: 13px;
+    color: var(--gris);
+    margin-top: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Ronda rápida — pantalla de fragmento uno-a-uno */
+  .ronda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+  .ronda-contador {
+    font-size: 13px;
+    color: var(--gris);
+    margin-bottom: 22px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+  }
+  .ronda-timer {
+    width: 100%;
+    max-width: 340px;
+    height: 6px;
+    background: var(--borde);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  .ronda-timer-fill {
+    height: 100%;
+    background: var(--teal);
+    width: 100%;
+  }
+  .ronda-timer-fill.urgente { background: var(--coral); }
+  .frag-raiz-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 68px;
+    font-weight: 700;
+    color: var(--violeta);
+    letter-spacing: 6px;
+    margin-bottom: 36px;
+    text-align: center;
+    line-height: 1;
+  }
+  .frag-raiz-big .dots {
+    color: var(--gris);
+    font-weight: 400;
+    letter-spacing: 8px;
+  }
+  .ronda input {
+    font-size: 22px;
+    text-align: center;
+    max-width: 340px;
+    padding: 16px;
+    font-weight: 500;
+  }
+  .ronda-hint {
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--gris);
+    text-align: center;
+  }
+
+  /* Pantalla de práctica */
+  .practica-badge {
+    display: inline-block;
+    background: var(--azul);
+    color: var(--violeta);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  /* Pantalla de envío / debrief */
+  .card {
+    background: linear-gradient(135deg, #8CC5E3 0%, #0D7E87 100%);
+    color: white;
+    padding: 22px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+  }
+  .card h2 { color: white; margin-bottom: 8px; }
+  .card p { margin-bottom: 8px; font-size: 15px; }
+  .card strong { color: #fff; }
+
+  .status {
+    font-size: 13px;
+    color: var(--gris);
+    text-align: center;
+    margin-top: 12px;
+  }
+  .status.err { color: var(--coral); }
+
+  .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid var(--borde);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="brand">NyPE · palabras</div>
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <!-- 0: alias -->
+  <div class="step active" data-step="0">
+    <h1>Un juego con palabras</h1>
+    <p class="lead">Dos partes cortas. Se toma menos de 3 minutos.</p>
+    <label for="alias">Alias</label>
+    <input type="text" id="alias" placeholder="ej: azul42" maxlength="30" autocomplete="off">
+    <button id="btn-empezar">Empezar</button>
+  </div>
+
+  <!-- 1: primes -->
+  <div class="step" data-step="1">
+    <h2>Parte 1</h2>
+    <p>Mirá estas palabras y <strong>tocá las 3 que más te gusten</strong>.</p>
+    <div class="primes" id="primes-grid"></div>
+    <div class="contador-sel"><span id="sel-count">0</span> de 3 elegidas</div>
+    <button id="btn-primes" disabled>Continuar</button>
+  </div>
+
+  <!-- 2: instrucciones ronda + práctica -->
+  <div class="step" data-step="2">
+    <h2>Parte 2</h2>
+    <p>Van a aparecer <strong>8 comienzos de palabras</strong>, uno por vez.</p>
+    <p>Para cada uno tenés <strong>5 segundos</strong> para escribir la primera palabra que se te venga que empiece así.</p>
+    <p class="lead">No hay respuestas correctas. Si no llegás con una, no importa: pasa sola.</p>
+    <p class="lead" style="margin-top:20px;">Antes de empezar, probá una vez con la palabra de práctica. Tocá el campo para abrir el teclado.</p>
+    <div style="background:white; border:1px solid var(--borde); border-radius:10px; padding:16px; margin-top:16px;">
+      <div class="practica-badge">Práctica</div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:var(--violeta); letter-spacing:2px; min-width:80px;">AR<span style="color:var(--gris); font-weight:400; letter-spacing:4px;">···</span></div>
+        <input type="text" id="practica-input" placeholder="cualquier palabra" autocomplete="off" autocorrect="off" autocapitalize="off">
+      </div>
+    </div>
+    <button id="btn-ronda" disabled>Empezar la ronda</button>
+    <div class="status" id="hint-practica" style="margin-top:8px;">Escribí algo en la práctica para habilitar el botón</div>
+  </div>
+
+  <!-- 3: ronda (fragmento uno a la vez, se recicla) -->
+  <div class="step" data-step="3">
+    <div class="ronda">
+      <div class="ronda-contador"><span id="ronda-idx">1</span> de 8</div>
+      <div class="ronda-timer"><div class="ronda-timer-fill" id="ronda-timer-fill"></div></div>
+      <div class="frag-raiz-big"><span id="ronda-raiz">ME</span><span class="dots">···</span></div>
+      <input type="text" id="ronda-input" placeholder="…" autocomplete="off" autocorrect="off" autocapitalize="off">
+      <div class="ronda-hint">enter para pasar antes</div>
+    </div>
+  </div>
+
+  <!-- 4: enviando / debrief -->
+  <div class="step" data-step="4">
+    <div id="enviando" style="text-align:center; padding:40px 20px;">
+      <div class="spinner"></div>
+      <span style="color:var(--gris);">Guardando respuestas…</span>
+    </div>
+
+    <div id="debrief" style="display:none;">
+      <h1>¡Listo!</h1>
+      <p>Gracias por participar.</p>
+
+      <div class="card">
+        <h2>Lo que hicimos</h2>
+        <p>A la mitad de la clase le mostramos <strong>palabras de comida</strong> en la parte 1. A la otra mitad, <strong>palabras de muebles</strong>.</p>
+        <p>Vos estabas en el grupo <strong id="grupo-tocado"></strong>.</p>
+        <p>En clase vamos a ver qué completaron los dos grupos en la parte 2.</p>
+      </div>
+
+      <p class="lead">Ya podés volver al aula.</p>
+    </div>
+
+    <div id="error-envio" style="display:none;">
+      <h2>No se pudo enviar</h2>
+      <p class="lead">Reintentá o avisale a la profe.</p>
+      <button id="btn-reintentar">Reintentar</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- =========================================================================
+     SUPABASE + LÓGICA
+     =========================================================================
+     Reemplazá SUPABASE_URL y SUPABASE_ANON_KEY.
+
+     SQL para crear la tabla:
+
+     create table priming_semantico (
+       id uuid default gen_random_uuid() primary key,
+       alias text,
+       grupo text check (grupo in ('comida','muebles')),
+       primes_favoritas text[],
+       completados jsonb,
+       tiempos_ms jsonb,
+       created_at timestamptz default now()
+     );
+
+     alter table priming_semantico enable row level security;
+     create policy "insert abierto" on priming_semantico for insert with check (true);
+     create policy "select abierto" on priming_semantico for select using (true);
+
+     Notas de análisis:
+       - completados es un objeto {raiz: respuesta}
+       - tiempos_ms guarda cuánto tardó en cada fragmento (útil para
+         descartar respuestas ultra rápidas que puedan ser azarosas, o
+         detectar quién especuló pese al timer)
+       - clasificar cada respuesta como sesgo_comida / sesgo_muebles / neutra
+         y hacer chi-cuadrado entre grupo y categoría de respuesta
+========================================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ---- CONFIG SUPABASE ----
+  const SUPABASE_URL = 'https://hmlluhywfgcuvcakkbcl.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtbGx1aHl3ZmdjdXZjYWtrYmNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1Nzc4NjgsImV4cCI6MjEwMzE1Mzg2OH0.oRmiXRoaB69JZk3qIbbLkuH9tV0zGOjhvF7HxmAjfG8';
+  const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ---- CONFIG EXPERIMENTO ----
+  const SEG_POR_FRAG = 5;   // duración de cada fragmento en segundos
+  const UMBRAL_URGENTE = 2; // segundos restantes en que la barra se pone roja
+
+  const PRIMES = {
+    comida:  ['pan', 'queso', 'manzana', 'pasta', 'pizza', 'sopa', 'torta', 'arroz'],
+    muebles: ['silla', 'mesa', 'cama', 'sillón', 'ropero', 'lámpara', 'alfombra', 'cortina']
+  };
+
+  const FRAGMENTOS = ['me', 'so', 'ca', 'pa', 'si', 'to', 'ma', 'ro'];
+
+  // ---- ESTADO ----
+  const estado = {
+    alias: '',
+    grupo: Math.random() < 0.5 ? 'comida' : 'muebles',
+    primes_favoritas: [],
+    completados: {},
+    tiempos_ms: {},
+    fragsOrder: [],
+    fragIdx: 0,
+    fragStart: 0
+  };
+
+  let timerTimeout = null;
+  let urgenteTimeout = null;
+
+  // ---- NAVEGACIÓN ----
+  function mostrarPaso(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.querySelector(`[data-step="${n}"]`).classList.add('active');
+    const prog = document.getElementById('progress');
+    if (n === 0 || n === 4) prog.textContent = '';
+    else if (n === 1) prog.textContent = 'parte 1 de 2';
+    else prog.textContent = 'parte 2 de 2';
+    window.scrollTo(0, 0);
+  }
+
+  // ---- Paso 0 → 1 ----
+  document.getElementById('btn-empezar').addEventListener('click', () => {
+    const alias = document.getElementById('alias').value.trim();
+    if (!alias) { document.getElementById('alias').focus(); return; }
+    estado.alias = alias;
+    renderPrimes();
+    mostrarPaso(1);
+  });
+
+  // ---- Primes ----
+  function renderPrimes() {
+    const grid = document.getElementById('primes-grid');
+    grid.innerHTML = '';
+    const palabras = [...PRIMES[estado.grupo]].sort(() => Math.random() - 0.5);
+    palabras.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'prime';
+      div.textContent = p;
+      div.addEventListener('click', () => togglePrime(div, p));
+      grid.appendChild(div);
+    });
+  }
+
+  function togglePrime(el, palabra) {
+    const idx = estado.primes_favoritas.indexOf(palabra);
+    if (idx >= 0) {
+      estado.primes_favoritas.splice(idx, 1);
+      el.classList.remove('sel');
+    } else {
+      if (estado.primes_favoritas.length >= 3) return;
+      estado.primes_favoritas.push(palabra);
+      el.classList.add('sel');
+    }
+    document.getElementById('sel-count').textContent = estado.primes_favoritas.length;
+    document.getElementById('btn-primes').disabled = estado.primes_favoritas.length !== 3;
+  }
+
+  // ---- Paso 1 → 2 (instrucciones + práctica) ----
+  document.getElementById('btn-primes').addEventListener('click', () => {
+    mostrarPaso(2);
+    // Focus a la práctica después de un momento
+    setTimeout(() => document.getElementById('practica-input').focus(), 200);
+  });
+
+  // Habilitar botón "empezar ronda" solo cuando escribieron algo en la práctica
+  document.getElementById('practica-input').addEventListener('input', (e) => {
+    const val = e.target.value.trim();
+    const btn = document.getElementById('btn-ronda');
+    const hint = document.getElementById('hint-practica');
+    if (val.length > 0) {
+      btn.disabled = false;
+      hint.style.display = 'none';
+    } else {
+      btn.disabled = true;
+      hint.style.display = 'block';
+    }
+  });
+
+  // ---- Paso 2 → 3 (ronda) ----
+  document.getElementById('btn-ronda').addEventListener('click', () => {
+    estado.fragsOrder = [...FRAGMENTOS].sort(() => Math.random() - 0.5);
+    estado.fragIdx = 0;
+    mostrarPaso(3);
+    // El input de la ronda va a recibir el foco heredado del contexto de tap
+    setTimeout(() => document.getElementById('ronda-input').focus(), 50);
+    setTimeout(() => siguienteFragmento(), 300);
+  });
+
+  // ---- Núcleo de la ronda ----
+  function siguienteFragmento() {
+    if (estado.fragIdx >= estado.fragsOrder.length) {
+      irAEnvio();
+      return;
+    }
+    const raiz = estado.fragsOrder[estado.fragIdx];
+    document.getElementById('ronda-raiz').textContent = raiz.toUpperCase();
+    document.getElementById('ronda-idx').textContent = estado.fragIdx + 1;
+
+    const inp = document.getElementById('ronda-input');
+    inp.value = '';
+    inp.focus();
+
+    // Reset de la barra
+    const bar = document.getElementById('ronda-timer-fill');
+    bar.classList.remove('urgente');
+    bar.style.transition = 'none';
+    bar.style.width = '100%';
+
+    // Forzar reflow y arrancar animación
+    void bar.offsetWidth;
+    bar.style.transition = `width ${SEG_POR_FRAG}s linear`;
+    bar.style.width = '0%';
+
+    estado.fragStart = Date.now();
+
+    // Advertencia visual cerca del final
+    clearTimeout(urgenteTimeout);
+    urgenteTimeout = setTimeout(() => {
+      bar.classList.add('urgente');
+    }, (SEG_POR_FRAG - UMBRAL_URGENTE) * 1000);
+
+    // Auto-avance
+    clearTimeout(timerTimeout);
+    timerTimeout = setTimeout(guardarYAvanzar, SEG_POR_FRAG * 1000);
+  }
+
+  function guardarYAvanzar() {
+    clearTimeout(timerTimeout);
+    clearTimeout(urgenteTimeout);
+    const raiz = estado.fragsOrder[estado.fragIdx];
+    const inp = document.getElementById('ronda-input');
+    const val = inp.value.trim().toLowerCase();
+    estado.completados[raiz] = val;
+    estado.tiempos_ms[raiz] = Date.now() - estado.fragStart;
+    estado.fragIdx++;
+    siguienteFragmento();
+  }
+
+  // Enter avanza manualmente
+  document.getElementById('ronda-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      guardarYAvanzar();
+    }
+  });
+
+  // ---- Envío ----
+  function irAEnvio() {
+    mostrarPaso(4);
+    document.getElementById('enviando').style.display = 'block';
+    document.getElementById('debrief').style.display = 'none';
+    document.getElementById('error-envio').style.display = 'none';
+    enviarDatos();
+  }
+
+  async function enviarDatos() {
+    const { error } = await supa.from('priming_semantico').insert({
+      alias: estado.alias,
+      grupo: estado.grupo,
+      primes_favoritas: estado.primes_favoritas,
+      completados: estado.completados,
+      tiempos_ms: estado.tiempos_ms
+    });
+
+    document.getElementById('enviando').style.display = 'none';
+
+    if (error) {
+      console.error(error);
+      document.getElementById('error-envio').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('grupo-tocado').textContent = estado.grupo;
+    document.getElementById('debrief').style.display = 'block';
+  }
+
+  document.getElementById('btn-reintentar').addEventListener('click', () => {
+    document.getElementById('error-envio').style.display = 'none';
+    document.getElementById('enviando').style.display = 'block';
+    enviarDatos();
+  });
+
+  // ---- Inicial ----
+  mostrarPaso(0);
+</script>
+</body>
+</html>
